@@ -50,7 +50,7 @@ jobs:
           fi
 
       - name: Build debug and release APKs
-        run: ./gradlew --no-daemon assembleDebug assembleRelease
+        run: ./gradlew --no-daemon -Pci=true assembleDebug assembleRelease
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
