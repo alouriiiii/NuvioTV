@@ -24,6 +24,9 @@ val devProperties = Properties().apply {
     }
 }
 
+val isCiBuild = providers.gradleProperty("ci").orNull == "true" ||
+    System.getenv("CI")?.equals("true", ignoreCase = true) == true
+
 android {
     namespace = "com.nuvio.tv"
     compileSdk = 36
@@ -79,7 +82,9 @@ android {
             buildConfigField("String", "IMDB_TAPFRAME_API_BASE_URL", "\"${devProperties.getProperty("IMDB_TAPFRAME_API_BASE_URL", "")}\"")
         }
         release {
-            isMinifyEnabled = true
+            // R8 minification is kept enabled for normal release builds,
+            // but disabled in CI to avoid flaky/unsupported shrinker failures.
+            isMinifyEnabled = !isCiBuild
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

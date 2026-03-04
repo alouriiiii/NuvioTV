@@ -59,6 +59,53 @@ cd NuvioTV
 adb shell am start -n com.nuvio.tv/.MainActivity
 ```
 
+
+### Build APKs
+
+#### Local
+
+```bash
+# Build debug APK
+./gradlew assembleDebug
+
+# Build release APK
+./gradlew assembleRelease
+```
+
+APK outputs:
+
+- `app/build/outputs/apk/debug/`
+- `app/build/outputs/apk/release/`
+
+#### GitHub Actions (CI)
+
+This repository includes a workflow at `.github/workflows/build-apk.yml` that builds APKs on:
+
+- push to `main`
+- pull requests
+- manual trigger (`workflow_dispatch`)
+
+To run it manually:
+
+1. Open **GitHub → Actions → Build APKs**.
+2. Click **Run workflow**.
+3. Download artifacts from the run summary.
+
+Optional signing secret for CI:
+
+- Secret name: `NUVIO_KEYSTORE_BASE64`
+- Value: Base64 content of `nuviotv.jks`
+
+Example command to generate the secret value:
+
+```bash
+base64 -w 0 nuviotv.jks
+```
+
+If the secret is not set, CI auto-generates a temporary keystore so the APK build still succeeds.
+
+Note: CI runs Gradle with `-Pci=true`, which disables release minification (`R8`) during CI APK packaging to make workflow builds more reliable. Local release builds keep minification enabled by default.
+
 ## Legal & DMCA
 
 NuvioTV functions solely as a client-side interface for browsing metadata and playing media provided by user-installed extensions and/or user-provided sources. It is intended for content the user owns or is otherwise authorized to access.
