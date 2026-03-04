@@ -1,0 +1,62 @@
+name: Build APKs
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Prepare signing keystore
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -n "${{ secrets.NUVIO_KEYSTORE_BASE64 || '' }}" ]; then
+            echo "Using keystore from secret NUVIO_KEYSTORE_BASE64"
+            echo "${{ secrets.NUVIO_KEYSTORE_BASE64 }}" | base64 --decode > nuviotv.jks
+          else
+            echo "NUVIO_KEYSTORE_BASE64 secret not found. Generating temporary keystore for CI builds."
+            keytool -genkeypair \
+              -keystore nuviotv.jks \
+              -storepass 815787 \
+              -keypass 815787 \
+              -alias nuviotv \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=NuvioTV CI, OU=CI, O=NuvioTV, L=NA, S=NA, C=US"
+          fi
+
+      - name: Build debug and release APKs
+        run: ./gradlew --no-daemon assembleDebug assembleRelease
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuviotv-apks-${{ github.run_number }}
+          if-no-files-found: error
+          path: |
+            app/build/outputs/apk/debug/*.apk
+            app/build/outputs/apk/release/*.apk
