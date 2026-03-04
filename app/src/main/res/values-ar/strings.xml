@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">نوفيو</string>
+    <string name="appearance_language">لغة التطبيق</string>
+    <string name="appearance_language_subtitle">تجاوز لغة النظام</string>
+    <string name="appearance_language_system">افتراضي النظام</string>
+    <string name="appearance_language_dialog_title">اختر اللغة</string>
+    <string name="appearance_language_restart_hint">أعد تشغيل التطبيق لتطبيق تغيير اللغة.</string>
+</resources>

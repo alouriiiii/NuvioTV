@@ -94,6 +94,7 @@ fun ThemeSettingsContent(
         listOf(
             null to strLanguageSystem,
             "en" to "English",
+            "ar" to "العربية",
             "es" to "Español",
             "es-419" to "Español (Latinoamérica)",
             "hu" to "Magyar",
